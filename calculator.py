@@ -48,7 +48,7 @@ class Calculator:
     @setup_calculator
     def lot_size_calculator(self, stop_loss):
         lot_size = (self.balance * (self.risk / 100)) / stop_loss * self.value
-        return lot_size
+        return f'Lote sugerido: {lot_size}'
     
 if __name__ == '__main__':
     pass
