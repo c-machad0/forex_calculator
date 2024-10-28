@@ -30,16 +30,15 @@ class Calculator:
     def pip_value(self):
         url = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={self.from_currency}&to_currency={self.to_currency}&apikey=CDSPQWSYJ6J9EXA4'
         response = requests.get(url)
-        data = response.json()
 
         # Verificando se a requisição foi bem-sucedida
         if response.status_code == 200:
+            # Convertendo o resultado para JSON
+            data = response.json()
             if self.to_currency == 'JPY':
                 pip = 0.01
             else:
                 pip = 0.0001
-            # Convertendo o resultado para JSON
-            data = response.json()
         
             # Extraindo a cotação atual do par de moedas
             exchange_rate = data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]
