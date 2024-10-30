@@ -4,7 +4,7 @@ from currency import find_currency
 try:
     initial_balance = float(input('Informe o balance de sua conta (ex: 5000): '))
 
-    if not initial_balance.is_integer():
+    if not isinstance(initial_balance, float):
         raise ValueError('A entrada deve conter numeros')
     
 except ValueError as error:
@@ -16,7 +16,7 @@ except Exception:
 try:
     risk_entry = float(input('Informe a porcentagem do balance que deseja arriscar (ex: 0.25): '))
 
-    if not initial_balance.is_integer():
+    if not isinstance(risk_entry, float):
         raise ValueError('A entrada deve conter numeros')
     
 except ValueError as error:
@@ -24,6 +24,15 @@ except ValueError as error:
     exit()
 except Exception:
     print(f'Erro não reconhecido')
+
+try:
+    stop_value = int(input('Informe o valor do stop (em pips. Ex: 40): '))
+
+    if not isinstance(stop_value, int):
+        raise ValueError('A entrada deve conter numeros')
+except ValueError as error:
+    print(f'Erro: {error}')
+    exit()
 
 try:
     option = str(input('Informe o par de moeda (ex: EURUSD): '))
@@ -39,7 +48,7 @@ try:
 
     if find_currency(from_currency, to_currency):
         lot_size_app = Calculator(from_currency, to_currency, initial_balance, risk_entry)
-        resultado_lot = lot_size_app.lot_size_calculator(20)
+        resultado_lot = lot_size_app.lot_size_calculator(stop_value)
 
         print(resultado_lot)
     else:
