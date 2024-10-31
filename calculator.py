@@ -39,19 +39,34 @@ class Calculator:
                 pip = 0.01
             else:
                 pip = 0.0001
-        
-            # Extraindo a cotação atual do par de moedas
-            exchange_rate = data["Realtime Currency Exchange Rate"]["5. Exchange Rate"]
             
-            self.value = (pip / float(exchange_rate)) * self.pattern_lot
+            try:   
+                # Extraindo a cotação atual do par de moedas
+                exchange_rate = float(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
+                
+                self.value = (pip / exchange_rate) * self.pattern_lot
+            except requests.RequestException as e:
+                print(f'{e}: Falha na requisição')
+            except (KeyError, ValueError) as e:
+                print(f'{e}: Erro ao extrair o câmbio da API')
+                self.value = None
         else:
             print("Falha na requisição")
+            self.value = None
 
     # Função que calcula o lote para a operação
     @setup_calculator
     def lot_size_calculator(self, stop_loss):
-        lot_size = (self.balance * (self.risk / 100)) / stop_loss * self.value
-        return f'Lote sugerido: {lot_size}'
+        if self.value is None:
+            print('Erro: o valor do pip não foi calculado corretamente')
+            return
+        
+        try:
+            lot_size = (self.balance * (self.risk / 100)) / stop_loss * self.value
+            return f'Lote sugerido: {lot_size}'
+        except ZeroDivisionError as e:
+            print(f'{e}: Stop loss não pode ser dividido por zero')
+            return None
     
 if __name__ == '__main__':
     pass
