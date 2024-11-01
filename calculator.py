@@ -29,30 +29,39 @@ class Calculator:
     # Função que calcula o valor do pip, com base na cotação atual
     def pip_value(self):
         url = f'https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency={self.from_currency}&to_currency={self.to_currency}&apikey=CDSPQWSYJ6J9EXA4'
-        response = requests.get(url)
 
-        # Verificando se a requisição foi bem-sucedida
-        if response.status_code == 200:
-            # Convertendo o resultado para JSON
-            data = response.json()
-            if self.to_currency == 'JPY':
-                pip = 0.01
-            else:
-                pip = 0.0001
-            
-            try:   
-                # Extraindo a cotação atual do par de moedas
-                exchange_rate = float(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
+        try:
+            response = requests.get(url)
+
+            # Verificando se a requisição foi bem-sucedida
+            if response.status_code == 200:
+
+                # Convertendo o resultado para JSON
+                data = response.json()
+
+                if self.to_currency == 'JPY':
+                    pip = 0.01
+                else:
+                    pip = 0.0001
                 
-                self.value = (pip / exchange_rate) * self.pattern_lot
-            except requests.RequestException as e:
-                print(f'{e}: Falha na requisição')
-            except (KeyError, ValueError) as e:
-                print(f'{e}: Erro ao extrair o câmbio da API')
+                try:   
+                    # Extraindo a cotação atual do par de moedas
+                    exchange_rate = float(data["Realtime Currency Exchange Rate"]["5. Exchange Rate"])
+                    self.value = (pip / exchange_rate) * self.pattern_lot
+                
+                except (KeyError, ValueError) as e:
+                    print(f'{e}: Erro ao extrair o câmbio da API')
+                    self.value = None
+
+            elif response.status_code == 429:
+                print('Erro: Limite de requisições na API foi excedido')
+
+            else:
+                print("Não foi possível obter a cotação")
                 self.value = None
-        else:
-            print("Falha na requisição")
-            self.value = None
+
+        except requests.RequestException as e:
+            print(f'{e}: Erro na requisição')
 
     # Função que calcula o lote para a operação
     @setup_calculator
